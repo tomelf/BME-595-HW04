@@ -1,18 +1,26 @@
 from my_img2num import MyImg2Num
+from nn_img2num import NnImg2Num
 from mnist import MNIST
 import torch
+import numpy as np
 
 def main():
-    m = MyImg2Num()
-    m.train()
+    print("Init MyImg2Num")
+    my = MyImg2Num()
+    my.train()
 
-    # Load MNIST
+    print("Init NnImg2Num")
+    nn = NnImg2Num()
+    nn.train()
+
+    print("==== Start testing ====")
+    print("Load MNIST")
     mndata = MNIST('./python-mnist/data')
     test_data, test_label = mndata.load_testing()
-    print test_label[0]
     test_label = oneHot(test_label)
-    print test_label[0]
-    print m.forward(test_data[0])
+    print("expected label", test_label[0])
+    print("MyImg2Num.forward", my.forward(test_data[0]))
+    print("NnImg2Num.forward", nn.forward(test_data[0]))
 
 def oneHot(label):
     ret = []

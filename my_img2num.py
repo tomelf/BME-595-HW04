@@ -7,7 +7,6 @@ class MyImg2Num(NeuralNetwork):
     def __init__(self):
         super(MyImg2Num, self).__init__()
         # Load MNIST
-        print("Load MNIST")
         mndata = MNIST('./python-mnist/data')
         self.train_data, self.train_label = mndata.load_training()
         # oneHot encoding
@@ -19,8 +18,11 @@ class MyImg2Num(NeuralNetwork):
         self.train_label = label
         in_layer = len(self.train_data[0])
         out_layer = len(self.train_label[0])
+        self.train_data = torch.ByteTensor(self.train_data)
+        self.train_label = torch.ByteTensor(self.train_label)
         # Intialize NeuralNetwork
         self.build(in_layer, in_layer/2, out_layer*2, out_layer)
+        self.eta=0.2
 
     def forward(self, img):
         img = torch.ByteTensor(img)
@@ -29,16 +31,15 @@ class MyImg2Num(NeuralNetwork):
         return np.argmax(output.numpy())
 
     def train(self):
-        print("Start training")
-        train_data = torch.ByteTensor(self.train_data)
-        train_label = torch.ByteTensor(self.train_label)
-        for i in range(len(train_data)):
+        print(type(self).__name__, "Start training")
+        for i in range(len(self.train_data)):
             if (i+1) % 1000 == 0:
-                print("{0:d} images were processed ...".format(i+1))
-            # if (i+1) >= 5000:
-            #     break
-            data = train_data[i]
-            label = train_label[i]
-            output = self.forward(data)
-            super(MyImg2Num, self).backward(label)
-            super(MyImg2Num, self).updateParams(eta=0.2)
+                print(type(self).__name__, "{0:d} images were processed ...".format(i+1))
+            if (i+1) >= 3000:
+                break
+            td = self.train_data[i]
+            tl = self.train_label[i]
+            pred_label = self.forward(td)
+            super(MyImg2Num, self).backward(tl)
+            super(MyImg2Num, self).updateParams(self.eta)
+        print(type(self).__name__, "Finish training")

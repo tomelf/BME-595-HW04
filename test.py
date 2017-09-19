@@ -1,8 +1,6 @@
 from my_img2num import MyImg2Num
 from nn_img2num import NnImg2Num
 from mnist import MNIST
-import torch
-import numpy as np
 
 def main():
     print("Init MyImg2Num")

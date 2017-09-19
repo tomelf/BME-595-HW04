@@ -36,17 +36,23 @@ class NnImg2Num(object):
         return np.argmax(self.model(Variable(torch.FloatTensor(img))).data.numpy())
 
     def train(self):
+        batch_size = 64
+
+        current_index = 0
+        num_train_data = self.train_data.size()[0]
+        i = 1
         print(type(self).__name__, "Start training")
-        for i in range(self.train_data.size()[0]):
-            if (i+1) % 1000 == 0:
-                print(type(self).__name__, "{0:d} images were processed ...".format(i+1))
-            if (i+1) >= 3000:
-                break
-            td = Variable(self.train_data[i])
-            tl = Variable(self.train_label[i])
+        while current_index < num_train_data:
+            if current_index > (10000*i):
+                print(type(self).__name__, "{0:d} images were processed ...".format(current_index))
+                i += 1
+            td = Variable(self.train_data[current_index:current_index+batch_size])
+            tl = Variable(self.train_label[current_index:current_index+batch_size])
             self.optimizer.zero_grad()
             pred_label = self.model(td)
             loss = self.loss_function(pred_label, tl)
             loss.backward()
             self.optimizer.step()
+            current_index += td.size()[0]
+        print(type(self).__name__, "{0:d} images were processed ...".format(current_index))
         print(type(self).__name__, "Finish training")

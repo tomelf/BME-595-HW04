@@ -23,16 +23,16 @@ class NnImg2Num(object):
         self.model = torch.nn.Sequential(
           torch.nn.Linear(in_layer, in_layer/2),
           torch.nn.Sigmoid(),
-          torch.nn.Linear(in_layer/2, out_layer*2),
+          torch.nn.Linear(in_layer/2, out_layer),
           torch.nn.Sigmoid(),
-          torch.nn.Linear(out_layer*2, out_layer),
-          torch.nn.Sigmoid()
         )
         self.loss_function = torch.nn.MSELoss()
         eta = 0.2
         self.optimizer = torch.optim.SGD(self.model.parameters(), lr=eta)
 
     def forward(self, img):
+        img = torch.FloatTensor(img)
+        img = img.view(img.size()[0]*img.size()[1]) if len(img.size()) == 2 else img
         return np.argmax(self.model(Variable(torch.FloatTensor(img))).data.numpy())
 
     def train(self):
@@ -43,7 +43,7 @@ class NnImg2Num(object):
         i = 1
         print(type(self).__name__, "Start training")
         while current_index < num_train_data:
-            if current_index > (10000*i):
+            if current_index > (1000*i):
                 print(type(self).__name__, "{0:d} images were processed ...".format(current_index))
                 i += 1
             td = Variable(self.train_data[current_index:current_index+batch_size])

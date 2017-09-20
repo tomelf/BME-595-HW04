@@ -32,9 +32,7 @@ class NeuralNetwork(object):
             a = []
             a_hat = []
 
-            input = input.view(1, input.size()[0]) if len(input.size()) == 1 else input
-            input = input.view(input.size()[1], input.size()[0])
-
+            input = input.view(input.size()[0], 1) if len(input.size()) == 1 else input
             a.append(input.clone()) # a(1) = x
             bias = torch.ones(1, input.size()[1]).float()
             a_hat.append(torch.cat((bias, input), 0)) # a_hat(1) = [bias, a(1)]
@@ -64,9 +62,7 @@ class NeuralNetwork(object):
             a_hat = self.a_hat[idx]
 
             target = target.float()
-            target = target.view(1, target.size()[0]) if len(target.size()) == 1 else target
-            target = target.view(target.size()[1], target.size()[0])
-
+            target = target.view(target.size()[0], 1) if len(target.size()) == 1 else target
             bias = torch.zeros(1, target.size()[1]).float()
             target = torch.cat((bias, target), 0)
 

@@ -31,16 +31,18 @@ class MyImg2Num(NeuralNetwork):
         return np.argmax(output.numpy())
 
     def train(self):
-        batch_size = 64
+        batch_size = 32
 
         current_index = 0
         num_train_data = self.train_data.size()[0]
         i = 1
         print(type(self).__name__, "Start training")
         while current_index < num_train_data:
-            if current_index > (1000*i):
+            if current_index >= (1000*i):
                 print(type(self).__name__, "{0:d} images were processed ...".format(current_index))
                 i += 1
+            if current_index >= 5000:
+                break
             td = self.train_data[current_index:current_index+batch_size]
             tl = self.train_label[current_index:current_index+batch_size]
             pred_label = super(MyImg2Num, self).forward(td)

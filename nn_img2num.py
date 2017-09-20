@@ -36,11 +36,11 @@ class NnImg2Num(object):
         return np.argmax(self.model(Variable(torch.FloatTensor(img))).data.numpy())
 
     def train(self):
-        batch_size = 1
+        batch_size = 32
 
         current_index = 0
         num_train_data = self.train_data.size()[0]
-        i = 32
+        i = 1
         print(type(self).__name__, "Start training")
         while current_index < num_train_data:
             if current_index >= (1000*i):

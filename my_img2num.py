@@ -32,29 +32,21 @@ class MyImg2Num(NeuralNetwork):
             img = img.view(img.size()[0]*img.size()[1])
         output = super(MyImg2Num, self).forward(img)
         # return output
-        return np.argmax(output.numpy())
+        if len(output.size())==2:
+            return np.argmax(output.numpy(), 1)
+        else:
+            return np.argmax(output.numpy())
 
     def train(self):
-        batch_size = 32
-        epoch = 1
-
-        print(type(self).__name__, "Start training")
-        for ep in range(epoch):
-            print(type(self).__name__, "Start epoch {0:d}".format(ep+1))
-
-            current_index = 0
-            num_train_data = self.train_data.size()[0]
-            i = 1
-            while current_index < num_train_data:
-                if current_index >= (1000*i):
-                    # print(type(self).__name__, "{0:d} images were processed ...".format(current_index))
-                    i += 1
-                td = self.train_data[current_index:current_index+batch_size]
-                tl = self.train_label[current_index:current_index+batch_size]
-                pred_label = super(MyImg2Num, self).forward(td)
-                super(MyImg2Num, self).backward(tl)
-                super(MyImg2Num, self).updateParams(self.eta)
-                current_index += td.size()[0]
-            # print(type(self).__name__, "{0:d} images were processed ...".format(current_index))
-
-        print(type(self).__name__, "Finish training")
+        batch_size = 128
+        # print(type(self).__name__, "Start training")
+        current_index = 0
+        num_train_data = self.train_data.size()[0]
+        while current_index < num_train_data:
+            td = self.train_data[current_index:current_index+batch_size]
+            tl = self.train_label[current_index:current_index+batch_size]
+            pred_label = super(MyImg2Num, self).forward(td)
+            super(MyImg2Num, self).backward(tl)
+            super(MyImg2Num, self).updateParams(self.eta)
+            current_index += td.size()[0]
+        # print(type(self).__name__, "Finish training")

@@ -65,4 +65,4 @@ class NeuralNetwork(object):
         self.eta = eta
         batch_size = self.a[0].size()[1]
         for i in range(len(self.Theta)):
-            self.Theta[i] -= (self.eta * self.dE_dTheta[i] / batch_size)
+            self.Theta[i] = self.Theta[i] - (self.eta * self.dE_dTheta[i] / batch_size)

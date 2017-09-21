@@ -27,32 +27,42 @@ class NnImg2Num(object):
           torch.nn.Sigmoid(),
         )
         self.loss_function = torch.nn.MSELoss()
-        eta = 0.2
-        self.optimizer = torch.optim.SGD(self.model.parameters(), lr=eta)
+        self.eta = 0.2
+        self.optimizer = torch.optim.SGD(self.model.parameters(), lr=self.eta)
 
     def forward(self, img):
         img = torch.FloatTensor(img)
-        img = img.view(img.size()[0]*img.size()[1]) if len(img.size()) == 2 else img
-        return np.argmax(self.model(Variable(torch.FloatTensor(img))).data.numpy())
+        if len(img.size()) == 3:
+            img = img.view(img.size()[0], img.size()[1]*img.size()[2])
+        elif len(img.size()) == 2:
+            img = img.view(img.size()[0]*img.size()[1])
+        output = self.model(Variable(torch.FloatTensor(img))).data
+        # return output
+        return np.argmax(output.numpy())
 
     def train(self):
         batch_size = 32
-
-        current_index = 0
-        num_train_data = self.train_data.size()[0]
-        i = 1
+        epoch = 1
         print(type(self).__name__, "Start training")
-        while current_index < num_train_data:
-            if current_index >= (1000*i):
-                print(type(self).__name__, "{0:d} images were processed ...".format(current_index))
-                i += 1
-            td = Variable(self.train_data[current_index:current_index+batch_size])
-            tl = Variable(self.train_label[current_index:current_index+batch_size])
-            self.optimizer.zero_grad()
-            pred_label = self.model(td)
-            loss = self.loss_function(pred_label, tl)
-            loss.backward()
-            self.optimizer.step()
-            current_index += td.size()[0]
-        print(type(self).__name__, "{0:d} images were processed ...".format(current_index))
+
+        for ep in range(epoch):
+            print(type(self).__name__, "Start epoch {0:d}".format(ep+1))
+
+            current_index = 0
+            num_train_data = self.train_data.size()[0]
+            i = 1
+            while current_index < num_train_data:
+                if current_index >= (1000*i):
+                    # print(type(self).__name__, "{0:d} images were processed ...".format(current_index))
+                    i += 1
+                td = Variable(self.train_data[current_index:current_index+batch_size])
+                tl = Variable(self.train_label[current_index:current_index+batch_size])
+                self.optimizer.zero_grad()
+                pred_label = self.model(td)
+                loss = self.loss_function(pred_label, tl)
+                loss.backward()
+                self.optimizer.step()
+                current_index += td.size()[0]
+            # print(type(self).__name__, "{0:d} images were processed ...".format(current_index))
+
         print(type(self).__name__, "Finish training")

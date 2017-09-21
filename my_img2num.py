@@ -26,28 +26,35 @@ class MyImg2Num(NeuralNetwork):
 
     def forward(self, img):
         img = torch.ByteTensor(img)
-        img = img.view(img.size()[0]*img.size()[1]) if len(img.size()) == 2 else img
+        if len(img.size()) == 3:
+            img = img.view(img.size()[0], img.size()[1]*img.size()[2])
+        elif len(img.size()) == 2:
+            img = img.view(img.size()[0]*img.size()[1])
         output = super(MyImg2Num, self).forward(img)
+        # return output
         return np.argmax(output.numpy())
 
     def train(self):
         batch_size = 32
+        epoch = 1
 
-        current_index = 0
-        num_train_data = self.train_data.size()[0]
-        i = 1
         print(type(self).__name__, "Start training")
-        while current_index < num_train_data:
-            if current_index >= (1000*i):
-                print(type(self).__name__, "{0:d} images were processed ...".format(current_index))
-                i += 1
-            if current_index >= 5000:
-                break
-            td = self.train_data[current_index:current_index+batch_size]
-            tl = self.train_label[current_index:current_index+batch_size]
-            pred_label = super(MyImg2Num, self).forward(td)
-            super(MyImg2Num, self).backward(tl)
-            super(MyImg2Num, self).updateParams(self.eta)
-            current_index += td.size()[0]
-        print(type(self).__name__, "{0:d} images were processed ...".format(current_index))
+        for ep in range(epoch):
+            print(type(self).__name__, "Start epoch {0:d}".format(ep+1))
+
+            current_index = 0
+            num_train_data = self.train_data.size()[0]
+            i = 1
+            while current_index < num_train_data:
+                if current_index >= (1000*i):
+                    # print(type(self).__name__, "{0:d} images were processed ...".format(current_index))
+                    i += 1
+                td = self.train_data[current_index:current_index+batch_size]
+                tl = self.train_label[current_index:current_index+batch_size]
+                pred_label = super(MyImg2Num, self).forward(td)
+                super(MyImg2Num, self).backward(tl)
+                super(MyImg2Num, self).updateParams(self.eta)
+                current_index += td.size()[0]
+            # print(type(self).__name__, "{0:d} images were processed ...".format(current_index))
+
         print(type(self).__name__, "Finish training")
